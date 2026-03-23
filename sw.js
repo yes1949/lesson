@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dictation-app-v1';
+const CACHE_NAME = 'dictation-app-v1.1';
 // 填入你需要缓存的文件列表
 const urlsToCache = [
   './',
