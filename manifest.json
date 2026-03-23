@@ -1,0 +1,21 @@
+{
+  "name": "英语严格默写检测工具",
+  "short_name": "严格默写",
+  "description": "一个用于严格检测英语课文默写正确率的离线工具。",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#F4F7F6",
+  "theme_color": "#4A90E2",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
