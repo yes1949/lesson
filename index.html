@@ -31,7 +31,10 @@
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            padding: 20px;
+            /* 左右内边距改小，让输入框向两侧拉伸 */
+            padding: 20px 10px; 
+            /* 防止滑动时产生浏览器的默认后退/前进行为 */
+            overscroll-behavior-x: none; 
         }
 
         /* 导航标签 */
@@ -62,14 +65,10 @@
             color: white;
         }
 
-        /* 页面容器 */
+        /* 页面容器 - 移除了卡片样式，使其完全透明扁平 */
         .container {
             width: 100%;
             max-width: 800px;
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: var(--shadow);
             display: none;
             animation: fadeIn 0.3s ease-in-out;
         }
@@ -77,7 +76,7 @@
         .container.active {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px; /* 控制控件之间的间距 */
         }
 
         @keyframes fadeIn {
@@ -116,7 +115,7 @@
             font-size: 16px;
             font-weight: bold;
             color: #555;
-            background: #eee;
+            background: #e2e6e9; /* 稍微加深一点适应浅灰背景 */
             padding: 8px 15px;
             border-radius: 6px;
         }
@@ -133,9 +132,25 @@
             outline: none;
             transition: border-color 0.3s;
             font-family: monospace;
+            background: #ffffff; /* 给输入框添加白底，使其在灰背景上凸显 */
+            box-shadow: var(--shadow); /* 保留输入框的轻微阴影提升质感 */
         }
 
         textarea:focus { border-color: var(--primary-color); }
+
+        /* 底部操作区 (用于排版版本号和按钮) */
+        .bottom-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .version-text {
+            font-size: 12px;
+            color: #999;
+            font-family: sans-serif;
+        }
 
         /* 模态框 (弹窗) */
         .modal-overlay {
@@ -242,20 +257,25 @@
             <span class="current-title" id="currentArticleTitle">未选择</span>
         </div>
         <textarea id="dictationInput" rows="10" placeholder=""></textarea>
-        <button class="btn btn-success" style="align-self: flex-end;" onclick="submitDictation()">提交</button>
+        <div class="bottom-actions">
+            <span class="version-text">v1.1</span>
+            <button class="btn btn-success" onclick="submitDictation()">提交</button>
+        </div>
     </div>
 
     <div id="viewAdd" class="container">
-        <h2 style="font-size: 20px; color: #444;"></h2>
+        <h2 style="font-size: 20px; color: #444; margin-bottom: -5px;"></h2>
         <textarea id="newArticleContent" rows="15" placeholder=""></textarea>
-        <button class="btn btn-success" style="align-self: flex-end;" onclick="openSaveModal()">保存</button>
+        <div class="bottom-actions" style="justify-content: flex-end;">
+            <button class="btn btn-success" onclick="openSaveModal()">保存</button>
+        </div>
     </div>
 
     <div id="modalSelect" class="modal-overlay">
         <div class="modal-content" style="max-width: 500px;">
             <div class="modal-title">选择</div>
             <ul class="article-list" id="articleList">
-                </ul>
+            </ul>
             <div class="modal-actions">
                 <button class="btn btn-outline" onclick="closeModal('modalSelect')">取消</button>
             </div>
@@ -313,6 +333,39 @@
             } else {
                 document.querySelectorAll('.tab-btn')[1].classList.add('active');
                 document.getElementById('viewAdd').classList.add('active');
+            }
+        }
+
+        // --- 滑动手势逻辑 (左右切换标签) ---
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        document.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, { passive: true });
+
+        function handleSwipe() {
+            // 如果有任何弹窗正在显示，则不触发滑动切换，避免误操作
+            if (document.querySelector('.modal-overlay.active')) return;
+
+            const swipeThreshold = 50; // 最小滑动距离触发阈值
+
+            if (touchEndX < touchStartX - swipeThreshold) {
+                // 向左滑：切换到“添加”页
+                if (document.getElementById('viewTest').classList.contains('active')) {
+                    switchTab('add');
+                }
+            }
+            if (touchEndX > touchStartX + swipeThreshold) {
+                // 向右滑：切换到“输入”页
+                if (document.getElementById('viewAdd').classList.contains('active')) {
+                    switchTab('test');
+                }
             }
         }
 
